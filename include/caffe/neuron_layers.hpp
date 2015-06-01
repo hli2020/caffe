@@ -738,6 +738,41 @@ class PReLULayer : public NeuronLayer<Dtype> {
   Blob<Dtype> bottom_memory_;  // memory for in-place computation
 };
 
+template <typename Dtype>
+class BiasLayer : public NeuronLayer<Dtype> {
+
+public:
+
+  explicit BiasLayer(const LayerParameter& param)
+      : NeuronLayer<Dtype>(param) {}
+
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual inline const char* type() const { return "Bias"; }
+
+protected:
+
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+  bool channel_shared_;
+  Blob<Dtype> multiplier_;  // dot multipler for backward computation of params
+  Blob<Dtype> backward_buff_; // temporary buffer for backward computation
+  //Blob<Dtype> bottom_memory_;  // memory for in-place computation
+
+};
+
 }  // namespace caffe
 
 #endif  // CAFFE_NEURON_LAYERS_HPP_
