@@ -271,7 +271,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 135 (last added: bias_param)
+// LayerParameter next available layer-specific ID: 136 (last added: bn_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -321,6 +321,7 @@ message LayerParameter {
   optional AccuracyParameter accuracy_param = 102;
   optional ArgMaxParameter argmax_param = 103;
   optional BiasParameter bias_param = 134;
+  optional BNParameter bn_param = 135;
   optional ConcatParameter concat_param = 104;
   optional ContrastiveLossParameter contrastive_loss_param = 105;
   optional ConvolutionParameter convolution_param = 106;
@@ -413,6 +414,11 @@ message ArgMaxParameter {
   optional uint32 top_k = 2 [default = 1];
 }
 
+message BNParameter {
+  optional FillerParameter scale_filler = 1;
+  optional FillerParameter shift_filler = 2;
+}
+
 message ConcatParameter {
   // The axis along which to concatenate -- may be negative to index from the
   // end (e.g., -1 for the last axis).  Other axes must have the
@@ -489,6 +495,8 @@ message DataParameter {
   optional bool mirror = 6 [default = false];
   // Force the encoded image to have 3 color channels
   optional bool force_encoded_color = 9 [default = false];
+  //  Size (x batch_size) of shuffle buffer for batch normalization layer
+  optional uint32 shuffle_buffer_size = 10;
 }
 
 message DropoutParameter {
