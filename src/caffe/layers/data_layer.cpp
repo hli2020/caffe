@@ -123,10 +123,10 @@ void DataLayer<Dtype>::InternalThreadEntry() {
   }
   bool force_color = this->layer_param_.data_param().force_encoded_color();
   int read_cycles = 1;
-  if ( !(this->shuffle_on_init) &&
-      (0 < this->layer_param_.data_param().shuffle_buffer_size())) {
-    read_cycles = 1+this->layer_param_.data_param().shuffle_buffer_size();
+  if ( !(this->shuffle_on_init) && (0 < this->layer_param_.data_param().shuffle_buffer_size())) {
+    read_cycles = 1 + this->layer_param_.data_param().shuffle_buffer_size();
   }
+  // super-huge cycle-for-loop
   for ( int cycle = 0; cycle < read_cycles ; ++cycle ) {
 
     for ( int item_id = 0; item_id < batch_size; ++item_id ) {
