@@ -365,8 +365,19 @@ void DataTransformer<Dtype>::Transform(const vector<cv::Mat> & mat_vector,
 }
 
 template<typename Dtype>
-void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img,
+void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img_ori,
                                        Blob<Dtype>* transformed_blob) {
+  // hli updated
+  cv::Mat cv_img;
+  const bool resize_first = param_.resize_first();
+  if (resize_first) {
+    const int fix_size = 256;
+    LOG(INFO) << "resize the image to 256 x 256 first!";
+    cv::resize(cv_img_ori, cv_img, cv::Size(fix_size, fix_size));
+  }
+  else {
+    cv_img = cv_img_ori;
+  }
   const int crop_size = param_.crop_size();
   const int img_channels = cv_img.channels();
   const int img_height = cv_img.rows;
@@ -682,10 +693,12 @@ vector<int> DataTransformer<Dtype>::InferBlobShape(const cv::Mat& cv_img) {
   const int img_channels = cv_img.channels();
   const int img_height = cv_img.rows;
   const int img_width = cv_img.cols;
+
+  // comment the following check on purpose by hyli
   // Check dimensions.
-  CHECK_GT(img_channels, 0);
-  CHECK_GE(img_height, crop_size);
-  CHECK_GE(img_width, crop_size);
+  // CHECK_GT(img_channels, 0);
+  // CHECK_GE(img_height, crop_size);
+  // CHECK_GE(img_width, crop_size);
   // Build BlobShape.
   vector<int> shape(4);
   shape[0] = 1;

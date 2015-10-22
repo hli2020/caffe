@@ -385,18 +385,15 @@ message TransformationParameter {
   optional bool fix_crop = 10 [default = false];
   //turn on to use stronger augmentation
   optional bool more_fix_crop = 15 [default = false];
-
   //if set to true, use multi-scale data augmentation
   optional bool multi_scale = 11 [default = false];
-
   // a list of float numbers less than 1 for multiple scales
   repeated float scale_ratios = 12;
-
   // maximal tolerated aspect ratio mismatch in the ratio list
-  optional int32 max_distort = 13 [default = 1];
-  
+  optional int32 max_distort = 13 [default = 1]; 
   //if set to true, it is optical flow field
   optional bool is_flow = 14 [default = false];
+  optional bool resize_first = 16 [default = false];
 }
 
 // Message that stores parameters shared by loss layers
