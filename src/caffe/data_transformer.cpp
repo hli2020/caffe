@@ -367,12 +367,12 @@ void DataTransformer<Dtype>::Transform(const vector<cv::Mat> & mat_vector,
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const cv::Mat& cv_img_ori,
                                        Blob<Dtype>* transformed_blob) {
-  // hli updated
+  // hyli updated
   cv::Mat cv_img;
   const bool resize_first = param_.resize_first();
   if (resize_first) {
     const int fix_size = 256;
-    LOG(INFO) << "resize the image to 256 x 256 first!";
+    //LOG(INFO) << "resize the image to 256 x 256 first!";
     cv::resize(cv_img_ori, cv_img, cv::Size(fix_size, fix_size));
   }
   else {
