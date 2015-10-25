@@ -443,8 +443,8 @@ protected:
 	shared_ptr<Caffe::RNG> prefetch_rng_;
 	vector<std::pair<std::string, vector<int> > > image_database_;
 	//enum WindowField { IMAGE_INDEX, LABEL, OVERLAP, X1, Y1, X2, Y2, NUM };
-	vector<vector<float> > fg_windows_;
-	vector<vector<float> > bg_windows_;
+	vector<Window> fg_windows_;
+	vector<Window> bg_windows_;
 	Blob<Dtype> data_mean_;
 	vector<Dtype> mean_values_;
 	bool has_mean_file_;

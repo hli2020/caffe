@@ -274,7 +274,8 @@ void WindowDataLayer<Dtype>::InternalThreadEntry() {
       // sample a window
       timer.Start();
       const unsigned int rand_index = PrefetchRand();
-      vector<float> window = (is_fg) ?
+      //vector<float> window = (is_fg) ?
+      Window window = (is_fg) ?
           fg_windows_[rand_index % fg_windows_.size()] :
           bg_windows_[rand_index % bg_windows_.size()];
 
