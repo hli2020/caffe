@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdint.h>
 
 #include "boost/scoped_ptr.hpp"
 #include "hdf5.h"
@@ -408,6 +409,15 @@ protected:
 template <typename Dtype>
 class WindowDataLayer : public BasePrefetchingDataLayer<Dtype> {
 public:
+	struct Window {
+    		int image_index;
+    		uint16_t label;
+    		float overlap;
+    		uint16_t x1;
+    		uint16_t y1;
+    		uint16_t x2;
+    		uint16_t y2;
+	};
 	explicit WindowDataLayer(const LayerParameter& param)
 	: BasePrefetchingDataLayer<Dtype>(param) {}
 	virtual ~WindowDataLayer();
@@ -432,7 +442,7 @@ protected:
 
 	shared_ptr<Caffe::RNG> prefetch_rng_;
 	vector<std::pair<std::string, vector<int> > > image_database_;
-	enum WindowField { IMAGE_INDEX, LABEL, OVERLAP, X1, Y1, X2, Y2, NUM };
+	//enum WindowField { IMAGE_INDEX, LABEL, OVERLAP, X1, Y1, X2, Y2, NUM };
 	vector<vector<float> > fg_windows_;
 	vector<vector<float> > bg_windows_;
 	Blob<Dtype> data_mean_;

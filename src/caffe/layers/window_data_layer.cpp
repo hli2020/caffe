@@ -116,7 +116,7 @@ void WindowDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       int label, x1, y1, x2, y2;
       float overlap;
       infile >> label >> overlap >> x1 >> y1 >> x2 >> y2;
-
+      /*
       vector<float> window(WindowDataLayer::NUM);
       window[WindowDataLayer::IMAGE_INDEX] = image_index;
       window[WindowDataLayer::LABEL] = label;
@@ -125,18 +125,27 @@ void WindowDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       window[WindowDataLayer::Y1] = y1;
       window[WindowDataLayer::X2] = x2;
       window[WindowDataLayer::Y2] = y2;
+      */
+      Window window;
+      window.image_index = image_index;
+      window.label = label;
+      window.overlap = overlap;
+      window.x1 = x1;
+      window.x2 = x2;
+      window.y1 = y1;
+      window.y2 = y2;
 
       // add window to foreground list or background list
       if (overlap >= fg_threshold) {
-        int label = window[WindowDataLayer::LABEL];
+        int label = window.label;
         CHECK_GT(label, 0);
         fg_windows_.push_back(window);
         label_hist.insert(std::make_pair(label, 0));
         label_hist[label]++;
       } else if (overlap < bg_threshold) {
         // background window, force label and overlap to 0
-        window[WindowDataLayer::LABEL] = 0;
-        window[WindowDataLayer::OVERLAP] = 0;
+        window.label = 0;
+        window.overlap = 0;
         bg_windows_.push_back(window);
         label_hist[0]++;
       }
@@ -273,12 +282,12 @@ void WindowDataLayer<Dtype>::InternalThreadEntry() {
 
       // load the image containing the window
       pair<std::string, vector<int> > image =
-          image_database_[window[WindowDataLayer<Dtype>::IMAGE_INDEX]];
+          image_database_[window.image_index];
 
       cv::Mat cv_img;
       if (this->cache_images_) {
         pair<std::string, Datum> image_cached =
-          image_database_cache_[window[WindowDataLayer<Dtype>::IMAGE_INDEX]];
+          image_database_cache_[window.image_index];
         cv_img = DecodeDatumToCVMat(image_cached.second, true);
       } else {
         cv_img = cv::imread(image.first, CV_LOAD_IMAGE_COLOR);
@@ -292,10 +301,10 @@ void WindowDataLayer<Dtype>::InternalThreadEntry() {
       const int channels = cv_img.channels();
 
       // crop window out of image and warp it
-      int x1 = window[WindowDataLayer<Dtype>::X1];
-      int y1 = window[WindowDataLayer<Dtype>::Y1];
-      int x2 = window[WindowDataLayer<Dtype>::X2];
-      int y2 = window[WindowDataLayer<Dtype>::Y2];
+      int x1 = window.x1;
+      int y1 = window.y1;
+      int x2 = window.x2;
+      int y2 = window.y2;
 
       int pad_w = 0;
       int pad_h = 0;
@@ -416,7 +425,7 @@ void WindowDataLayer<Dtype>::InternalThreadEntry() {
       }
       trans_time += timer.MicroSeconds();
       // get window label
-      top_label[item_id] = window[WindowDataLayer<Dtype>::LABEL];
+      top_label[item_id] = window.label;
 
       #if 0
       // useful debugging code for dumping transformed windows to disk
