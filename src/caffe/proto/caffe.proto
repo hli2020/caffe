@@ -423,6 +423,8 @@ message AccuracyParameter {
 
   // If specified, ignore instances with the given label.
   optional int32 ignore_label = 3;
+  // type=1, original accuracy; type=2, adapted version
+  optional int32 type = 4 [default = 1];
 }
 
 message ArgMaxParameter {

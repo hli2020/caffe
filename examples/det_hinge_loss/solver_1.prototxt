@@ -1,0 +1,24 @@
+# solver for finetune
+net: "train_val_vgg_1.prototxt"
+snapshot_prefix: "result/vgg_ft_p1"
+device_id: 1
+
+test_iter: 1250
+test_interval: 2500
+test_initialization: false
+display: 20
+average_loss: 20
+
+momentum: 0.9
+weight_decay: 0.0001
+
+lr_policy: "step"
+base_lr: 0.005 #VGG case is 0.005 # googlenet case #0.35 #0.05
+gamma: 0.1
+stepsize: 100000
+max_iter: 300000	# max_iter does not change
+
+snapshot: 2500
+debug_info: false
+solver_mode: GPU
+richness: 20

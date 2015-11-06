@@ -20,6 +20,12 @@ void AccuracyLayer<Dtype>::LayerSetUp(
   if (has_ignore_label_) {
     ignore_label_ = this->layer_param_.accuracy_param().ignore_label();
   }
+  if (this->layer_param_.accuracy_param().type() ==1)
+  {
+	  LOG(INFO) <<"Multi-nomimial accuracy\n";
+  }
+  else
+	  LOG(INFO) <<"Hinge Loss accuracy\n";
 }
 
 template <typename Dtype>
@@ -50,38 +56,80 @@ void AccuracyLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const int num_labels = bottom[0]->shape(label_axis_);
   vector<Dtype> maxval(top_k_+1);
   vector<int> max_id(top_k_+1);
-  int count = 0;
-  for (int i = 0; i < outer_num_; ++i) {
-    for (int j = 0; j < inner_num_; ++j) {
-      const int label_value =
-          static_cast<int>(bottom_label[i * inner_num_ + j]);
-      if (has_ignore_label_ && label_value == ignore_label_) {
-        continue;
+  if (this->layer_param_.accuracy_param().type() == 1)
+  {
+      int count = 0;
+      for (int i = 0; i < outer_num_; ++i) {
+          for (int j = 0; j < inner_num_; ++j) {
+              const int label_value =
+                      static_cast<int>(bottom_label[i * inner_num_ + j]);
+              if (has_ignore_label_ && label_value == ignore_label_) {
+                  continue;
+              }
+              DCHECK_GE(label_value, 0);
+              DCHECK_LT(label_value, num_labels);
+              // Top-k accuracy
+              std::vector<std::pair<Dtype, int> > bottom_data_vector;
+              for (int k = 0; k < num_labels; ++k) {
+                  bottom_data_vector.push_back(std::make_pair(
+                          bottom_data[i * dim + k * inner_num_ + j], k));
+              }
+              std::partial_sort(
+                      bottom_data_vector.begin(), bottom_data_vector.begin() + top_k_,
+                      bottom_data_vector.end(), std::greater<std::pair<Dtype, int> >());
+              // check if true label is in top k predictions
+              for (int k = 0; k < top_k_; k++) {
+                  if (bottom_data_vector[k].second == label_value) {
+                      ++accuracy;
+                      break;
+                  }
+              }
+              ++count;
+          }
       }
-      DCHECK_GE(label_value, 0);
-      DCHECK_LT(label_value, num_labels);
-      // Top-k accuracy
-      std::vector<std::pair<Dtype, int> > bottom_data_vector;
-      for (int k = 0; k < num_labels; ++k) {
-        bottom_data_vector.push_back(std::make_pair(
-            bottom_data[i * dim + k * inner_num_ + j], k));
+      
+      // LOG(INFO) << "Accuracy: " << accuracy;
+      top[0]->mutable_cpu_data()[0] = accuracy / count;
+  }
+  else
+  {   // added code from wanli
+      #define POS_W 2
+// dim = num_labels, inner_num_ = 1, outer_num_ = batch num, 
+//              LOG(INFO)<<"outer_num_: " << outer_num_ << " inner_num_: " << inner_num_ << " dim:" << dim <<" num_labels: " << num_labels;
+      int count = 0;
+      for (int i = 0; i < outer_num_; ++i) {
+          for (int j = 0; j < inner_num_; ++j) {
+              const int label_value =
+                      static_cast<int>(bottom_label[i * inner_num_ + j]);
+              if (has_ignore_label_ && label_value == ignore_label_) {
+                  continue;
+              }
+              
+              DCHECK_GE(label_value, 0);
+              DCHECK_LT(label_value, num_labels);
+              for (int k = 0; k < num_labels; ++k) {
+                  if (label_value == (k+1))
+                  {// positive for class j
+//				  prob += max(Dtype(0), 1-bottom_data[i * dim + j]);
+//                      prob += max(Dtype(0), 2-2*bottom_data[i * dim + k * inner_num_ + j]);
+                      if (bottom_data[i * dim + k * inner_num_ + j] > 0) {
+                          ++accuracy;
+                      }
+                  }
+                  else
+                  {// negative for class j
+//                      prob += max(Dtype(0), 1+bottom_data[i * dim + k * inner_num_ + j]);
+                      if (bottom_data[i * dim + k * inner_num_ + j] < 0) {
+                          ++accuracy;
+                      }
+                  }
+              }
+              ++count;
+          }
       }
-      std::partial_sort(
-          bottom_data_vector.begin(), bottom_data_vector.begin() + top_k_,
-          bottom_data_vector.end(), std::greater<std::pair<Dtype, int> >());
-      // check if true label is in top k predictions
-      for (int k = 0; k < top_k_; k++) {
-        if (bottom_data_vector[k].second == label_value) {
-          ++accuracy;
-          break;
-        }
-      }
-      ++count;
-    }
+      (top)[0]->mutable_cpu_data()[0] = num_labels - accuracy / count;
   }
 
-  // LOG(INFO) << "Accuracy: " << accuracy;
-  top[0]->mutable_cpu_data()[0] = accuracy / count;
   // Accuracy layer should not be used as a loss function.
 }
 
