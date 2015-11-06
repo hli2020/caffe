@@ -15,7 +15,7 @@ weight_decay: 0.0001
 lr_policy: "step"
 base_lr: 0.005 #VGG case is 0.005 # googlenet case #0.35 #0.05
 gamma: 0.1
-stepsize: 100000
+stepsize: 100000	# double the size of original finetuned 
 max_iter: 300000	# max_iter does not change
 
 snapshot: 2500
