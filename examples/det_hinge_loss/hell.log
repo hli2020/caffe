@@ -1,0 +1,952 @@
+I1107 16:01:45.668081 22110 common.cpp:53] Running parallel training with MPI support!
+I1107 16:01:45.668414 22109 common.cpp:53] Running parallel training with MPI support!
+Setting device 1
+Setting device 0
+I1107 16:01:46.491667 22109 caffe.cpp:174] Starting Optimization
+I1107 16:01:46.491739 22109 solver.cpp:34] Initializing solver from parameters: 
+test_iter: 1250
+test_interval: 2500
+base_lr: 0.005
+display: 20
+max_iter: 300000
+lr_policy: "step"
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.0001
+stepsize: 100000
+snapshot: 2500
+snapshot_prefix: "result/vgg_ft_p1"
+solver_mode: GPU
+device_id: 0
+device_id: 1
+debug_info: false
+net: "train_val_vgg_1.prototxt"
+test_initialization: false
+average_loss: 20
+richness: 20
+I1107 16:01:46.491755 22109 solver.cpp:75] Creating training net from net file: train_val_vgg_1.prototxt
+I1107 16:01:46.492802 22109 net.cpp:332] The NetState phase (0) differed from the phase (1) specified by a rule in layer data
+I1107 16:01:46.492840 22109 net.cpp:332] The NetState phase (0) differed from the phase (1) specified by a rule in layer loss_top-1
+I1107 16:01:46.492848 22109 net.cpp:332] The NetState phase (0) differed from the phase (1) specified by a rule in layer loss_top-5
+I1107 16:01:46.493229 22109 net.cpp:45] Initializing net from parameters: 
+name: "VGG"
+state {
+  phase: TRAIN
+}
+layer {
+  name: "data"
+  type: "WindowData"
+  top: "data"
+  top: "label_gather"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    mirror: true
+    crop_size: 224
+    mean_value: 104
+    mean_value: 117
+    mean_value: 123
+  }
+  window_data_param {
+    source: "/home/hongyang/research_office/project/cvpr16/finetune/output/old/cls_1k_ft.txt"
+    batch_size: 64
+    fg_threshold: 0.500001
+    bg_threshold: 0.500001
+    fg_fraction: 0.25
+    context_pad: 16
+    crop_mode: "warp"
+    root_folder: "/home/hongyang/ImageNet_data_1/cls_original_image/train"
+  }
+}
+layer {
+  name: "conv1_1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1_1"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.059
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu1_1"
+  type: "ReLU"
+  bottom: "conv1_1"
+  top: "conv1_1"
+}
+layer {
+  name: "conv1_2"
+  type: "Convolution"
+  bottom: "conv1_1"
+  top: "conv1_2"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.059
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu1_2"
+  type: "ReLU"
+  bottom: "conv1_2"
+  top: "conv1_2"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1_2"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv2_1"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2_1"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.042
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu2_1"
+  type: "ReLU"
+  bottom: "conv2_1"
+  top: "conv2_1"
+}
+layer {
+  name: "conv2_2"
+  type: "Convolution"
+  bottom: "conv2_1"
+  top: "conv2_2"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.042
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu2_2"
+  type: "ReLU"
+  bottom: "conv2_2"
+  top: "conv2_2"
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2_2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv3_1"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv3_1"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.029
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu3_1"
+  type: "ReLU"
+  bottom: "conv3_1"
+  top: "conv3_1"
+}
+layer {
+  name: "conv3_2"
+  type: "Convolution"
+  bottom: "conv3_1"
+  top: "conv3_2"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.029
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu3_2"
+  type: "ReLU"
+  bottom: "conv3_2"
+  top: "conv3_2"
+}
+layer {
+  name: "conv3_3"
+  type: "Convolution"
+  bottom: "conv3_2"
+  top: "conv3_3"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.029
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu3_3"
+  type: "ReLU"
+  bottom: "conv3_3"
+  top: "conv3_3"
+}
+layer {
+  name: "conv3_4"
+  type: "Convolution"
+  bottom: "conv3_3"
+  top: "conv3_4"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.029
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu3_4"
+  type: "ReLU"
+  bottom: "conv3_4"
+  top: "conv3_4"
+}
+layer {
+  name: "pool3"
+  type: "Pooling"
+  bottom: "conv3_4"
+  top: "pool3"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv4_1"
+  type: "Convolution"
+  bottom: "pool3"
+  top: "conv4_1"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.021
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu4_1"
+  type: "ReLU"
+  bottom: "conv4_1"
+  top: "conv4_1"
+}
+layer {
+  name: "conv4_2"
+  type: "Convolution"
+  bottom: "conv4_1"
+  top: "conv4_2"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.021
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu4_2"
+  type: "ReLU"
+  bottom: "conv4_2"
+  top: "conv4_2"
+}
+layer {
+  name: "conv4_3"
+  type: "Convolution"
+  bottom: "conv4_2"
+  top: "conv4_3"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.021
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu4_3"
+  type: "ReLU"
+  bottom: "conv4_3"
+  top: "conv4_3"
+}
+layer {
+  name: "conv4_4"
+  type: "Convolution"
+  bottom: "conv4_3"
+  top: "conv4_4"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.021
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu4_4"
+  type: "ReLU"
+  bottom: "conv4_4"
+  top: "conv4_4"
+}
+layer {
+  name: "pool4"
+  type: "Pooling"
+  bottom: "conv4_4"
+  top: "pool4"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv5_1"
+  type: "Convolution"
+  bottom: "pool4"
+  top: "conv5_1"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.021
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu5_1"
+  type: "ReLU"
+  bottom: "conv5_1"
+  top: "conv5_1"
+}
+layer {
+  name: "conv5_2"
+  type: "Convolution"
+  bottom: "conv5_1"
+  top: "conv5_2"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.021
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu5_2"
+  type: "ReLU"
+  bottom: "conv5_2"
+  top: "conv5_2"
+}
+layer {
+  name: "conv5_3"
+  type: "Convolution"
+  bottom: "conv5_2"
+  top: "conv5_3"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.021
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu5_3"
+  type: "ReLU"
+  bottom: "conv5_3"
+  top: "conv5_3"
+}
+layer {
+  name: "conv5_4"
+  type: "Convolution"
+  bottom: "conv5_3"
+  top: "conv5_4"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.021
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu5_4"
+  type: "ReLU"
+  bottom: "conv5_4"
+  top: "conv5_4"
+}
+layer {
+  name: "pool5_spm5"
+  type: "Pooling"
+  bottom: "conv5_4"
+  top: "pool5_spm5"
+  pooling_param {
+    pool: MAX
+    kernel_size: 7
+    stride: 7
+  }
+}
+layer {
+  name: "pool5_spm5_flatten"
+  type: "Flatten"
+  bottom: "pool5_spm5"
+  top: "pool5_spm5_flatten"
+}
+layer {
+  name: "pool5_spm3"
+  type: "Pooling"
+  bottom: "conv5_4"
+  top: "pool5_spm3"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 3
+  }
+}
+layer {
+  name: "pool5_spm3_flatten"
+  type: "Flatten"
+  bottom: "pool5_spm3"
+  top: "pool5_spm3_flatten"
+}
+layer {
+  name: "pool5_spm2"
+  type: "Pooling"
+  bottom: "conv5_4"
+  top: "pool5_spm2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 5
+    stride: 5
+  }
+}
+layer {
+  name: "pool5_spm2_flatten"
+  type: "Flatten"
+  bottom: "pool5_spm2"
+  top: "pool5_spm2_flatten"
+}
+layer {
+  name: "pool5_spm1"
+  type: "Pooling"
+  bottom: "conv5_4"
+  top: "pool5_spm1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 14
+    stride: 14
+  }
+}
+layer {
+  name: "pool5_spm1_flatten"
+  type: "Flatten"
+  bottom: "pool5_spm1"
+  top: "pool5_spm1_flatten"
+}
+layer {
+  name: "pool5_spm"
+  type: "Concat"
+  bottom: "pool5_spm1_flatten"
+  bottom: "pool5_spm2_flatten"
+  bottom: "pool5_spm3_flatten"
+  bottom: "pool5_spm5_flatten"
+  top: "pool5_spm"
+  concat_param {
+    concat_dim: 1
+  }
+}
+layer {
+  name: "pool5_gather"
+  type: "Gather"
+  bottom: "pool5_spm"
+  bottom: "label_gather"
+  top: "pool5_spm_gather"
+  top: "label"
+}
+layer {
+  name: "fc6-spp"
+  type: "InnerProduct"
+  bottom: "pool5_spm_gather"
+  top: "fc6"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 4096
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
+}
+layer {
+  name: "drop6"
+  type: "Dropout"
+  bottom: "fc6"
+  top: "fc6"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  name: "fc7-spp"
+  type: "InnerProduct"
+  bottom: "fc6"
+  top: "fc7"
+  param {
+    lr_mult: 0
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 4096
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "fc7"
+  top: "fc7"
+}
+layer {
+  name: "drop7"
+  type: "Dropout"
+  bottom: "fc7"
+  top: "fc7"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  name: "fc8-spp_ft"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "fc8_ft"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 1001
+    weight_filler {
+      type: "gaussian"
+      std: 0.001
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "HingeLoss4Det"
+  bottom: "fc8_ft"
+  bottom: "label"
+  top: "loss"
+  loss_weight: 1
+}
+I1107 16:01:46.493394 22109 layer_factory.hpp:74] Creating layer data
+I1107 16:01:46.493408 22109 net.cpp:94] Creating Layer data
+I1107 16:01:46.493417 22109 net.cpp:413] data -> data
+I1107 16:01:46.493434 22109 net.cpp:413] data -> label_gather
+I1107 16:01:46.493441 22109 net.cpp:158] Setting up data
+I1107 16:01:46.493751 22109 window_data_layer.cpp:51] Window data layer:
+  foreground (object) overlap threshold: 0.500001
+  background (non-object) overlap threshold: 0.500001
+  foreground sampling fraction: 0.25
+  cache_images: 0
+  root_folder: /home/hongyang/ImageNet_data_1/cls_original_image/train
+I1107 16:01:46.493901 22109 window_data_layer.cpp:155] num: 0 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_10026.JPEG 3 250 250 windows to process: 201
+I1107 16:01:46.503960 22109 window_data_layer.cpp:155] num: 100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_11170.JPEG 3 333 500 windows to process: 201
+I1107 16:01:46.514175 22109 window_data_layer.cpp:155] num: 200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_12283.JPEG 3 378 500 windows to process: 201
+I1107 16:01:46.524544 22109 window_data_layer.cpp:155] num: 300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_13643.JPEG 3 203 270 windows to process: 201
+I1107 16:01:46.534701 22109 window_data_layer.cpp:155] num: 400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_1552.JPEG 3 450 350 windows to process: 201
+I1107 16:01:46.544428 22109 window_data_layer.cpp:155] num: 500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_2121.JPEG 3 480 640 windows to process: 201
+I1107 16:01:46.554206 22109 window_data_layer.cpp:155] num: 600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_28275.JPEG 3 373 500 windows to process: 201
+I1107 16:01:46.564244 22109 window_data_layer.cpp:155] num: 700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_3603.JPEG 3 333 500 windows to process: 201
+I1107 16:01:46.574743 22109 window_data_layer.cpp:155] num: 800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_5103.JPEG 3 519 623 windows to process: 201
+I1107 16:01:46.585172 22109 window_data_layer.cpp:155] num: 900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_6275.JPEG 3 480 640 windows to process: 201
+I1107 16:01:46.595264 22109 window_data_layer.cpp:155] num: 1000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_7277.JPEG 3 239 350 windows to process: 201
+I1107 16:01:46.605310 22109 window_data_layer.cpp:155] num: 1100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_8164.JPEG 3 224 230 windows to process: 201
+I1107 16:01:46.615161 22109 window_data_layer.cpp:155] num: 1200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01440764/n01440764_910.JPEG 3 318 413 windows to process: 201
+I1107 16:01:46.625144 22109 window_data_layer.cpp:155] num: 1300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_10107.JPEG 3 500 333 windows to process: 201
+I1107 16:01:46.635164 22109 window_data_layer.cpp:155] num: 1400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_11932.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.647369 22109 window_data_layer.cpp:155] num: 1500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_13255.JPEG 3 333 500 windows to process: 201
+I1107 16:01:46.657255 22109 window_data_layer.cpp:155] num: 1600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_1504.JPEG 3 500 500 windows to process: 201
+I1107 16:01:46.667052 22109 window_data_layer.cpp:155] num: 1700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_17000.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.676815 22109 window_data_layer.cpp:155] num: 1800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_1832.JPEG 3 500 360 windows to process: 201
+I1107 16:01:46.686713 22109 window_data_layer.cpp:155] num: 1900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_20186.JPEG 3 334 500 windows to process: 201
+I1107 16:01:46.696501 22109 window_data_layer.cpp:155] num: 2000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_21855.JPEG 3 1199 1600 windows to process: 201
+I1107 16:01:46.707000 22109 window_data_layer.cpp:155] num: 2100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_23437.JPEG 3 334 500 windows to process: 201
+I1107 16:01:46.717572 22109 window_data_layer.cpp:155] num: 2200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_2894.JPEG 3 231 80 windows to process: 201
+I1107 16:01:46.727399 22109 window_data_layer.cpp:155] num: 2300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_4120.JPEG 3 600 390 windows to process: 203
+I1107 16:01:46.737293 22109 window_data_layer.cpp:155] num: 2400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_579.JPEG 3 602 1024 windows to process: 201
+I1107 16:01:46.747437 22109 window_data_layer.cpp:155] num: 2500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01443537/n01443537_801.JPEG 3 685 1023 windows to process: 202
+I1107 16:01:46.757277 22109 window_data_layer.cpp:155] num: 2600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_10385.JPEG 3 333 500 windows to process: 201
+I1107 16:01:46.767120 22109 window_data_layer.cpp:155] num: 2700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_1390.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.778426 22109 window_data_layer.cpp:155] num: 2800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_16076.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.788403 22109 window_data_layer.cpp:155] num: 2900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_17913.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.798398 22109 window_data_layer.cpp:155] num: 3000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_19617.JPEG 3 332 500 windows to process: 201
+I1107 16:01:46.810698 22109 window_data_layer.cpp:155] num: 3100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_21831.JPEG 3 393 500 windows to process: 201
+I1107 16:01:46.820634 22109 window_data_layer.cpp:155] num: 3200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_23933.JPEG 3 310 500 windows to process: 201
+I1107 16:01:46.831774 22109 window_data_layer.cpp:155] num: 3300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_26462.JPEG 3 333 500 windows to process: 201
+I1107 16:01:46.841884 22109 window_data_layer.cpp:155] num: 3400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_30088.JPEG 3 333 500 windows to process: 201
+I1107 16:01:46.851827 22109 window_data_layer.cpp:155] num: 3500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_3604.JPEG 3 334 500 windows to process: 201
+I1107 16:01:46.861681 22109 window_data_layer.cpp:155] num: 3600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_523.JPEG 3 334 500 windows to process: 201
+I1107 16:01:46.871666 22109 window_data_layer.cpp:155] num: 3700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_7155.JPEG 3 334 500 windows to process: 201
+I1107 16:01:46.881544 22109 window_data_layer.cpp:155] num: 3800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01484850/n01484850_8456.JPEG 3 333 500 windows to process: 201
+I1107 16:01:46.892890 22109 window_data_layer.cpp:155] num: 3900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_10332.JPEG 3 363 500 windows to process: 201
+I1107 16:01:46.902940 22109 window_data_layer.cpp:155] num: 4000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_11781.JPEG 3 442 650 windows to process: 201
+I1107 16:01:46.913362 22109 window_data_layer.cpp:155] num: 4100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_13843.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.923243 22109 window_data_layer.cpp:155] num: 4200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_2183.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.933395 22109 window_data_layer.cpp:155] num: 4300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_3115.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.944149 22109 window_data_layer.cpp:155] num: 4400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_3745.JPEG 3 416 311 windows to process: 201
+I1107 16:01:46.955317 22109 window_data_layer.cpp:155] num: 4500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_4703.JPEG 3 333 500 windows to process: 201
+I1107 16:01:46.965234 22109 window_data_layer.cpp:155] num: 4600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_5389.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.975194 22109 window_data_layer.cpp:155] num: 4700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_6019.JPEG 3 375 500 windows to process: 201
+I1107 16:01:46.985054 22109 window_data_layer.cpp:155] num: 4800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_6682.JPEG 3 322 500 windows to process: 201
+I1107 16:01:46.995067 22109 window_data_layer.cpp:155] num: 4900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_7284.JPEG 3 500 332 windows to process: 201
+I1107 16:01:47.005062 22109 window_data_layer.cpp:155] num: 5000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_8107.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.016276 22109 window_data_layer.cpp:155] num: 5100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01491361/n01491361_905.JPEG 3 333 500 windows to process: 201
+I1107 16:01:47.026238 22109 window_data_layer.cpp:155] num: 5200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_10749.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.036206 22109 window_data_layer.cpp:155] num: 5300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_12716.JPEG 3 476 714 windows to process: 201
+I1107 16:01:47.046079 22109 window_data_layer.cpp:155] num: 5400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_15094.JPEG 3 333 500 windows to process: 201
+I1107 16:01:47.056057 22109 window_data_layer.cpp:155] num: 5500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_16861.JPEG 3 334 500 windows to process: 201
+I1107 16:01:47.065882 22109 window_data_layer.cpp:155] num: 5600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_1921.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.076998 22109 window_data_layer.cpp:155] num: 5700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_2306.JPEG 3 333 500 windows to process: 201
+I1107 16:01:47.086897 22109 window_data_layer.cpp:155] num: 5800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_28076.JPEG 3 318 500 windows to process: 201
+I1107 16:01:47.096876 22109 window_data_layer.cpp:155] num: 5900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_3768.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.106907 22109 window_data_layer.cpp:155] num: 6000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_4795.JPEG 3 488 650 windows to process: 201
+I1107 16:01:47.117236 22109 window_data_layer.cpp:155] num: 6100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_590.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.131247 22109 window_data_layer.cpp:155] num: 6200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_6912.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.142443 22109 window_data_layer.cpp:155] num: 6300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_7774.JPEG 3 500 334 windows to process: 201
+I1107 16:01:47.152309 22109 window_data_layer.cpp:155] num: 6400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01494475/n01494475_902.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.162176 22109 window_data_layer.cpp:155] num: 6500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_11030.JPEG 3 244 225 windows to process: 201
+I1107 16:01:47.172200 22109 window_data_layer.cpp:155] num: 6600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_12558.JPEG 3 458 709 windows to process: 201
+I1107 16:01:47.182160 22109 window_data_layer.cpp:155] num: 6700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_14886.JPEG 3 600 765 windows to process: 201
+I1107 16:01:47.192078 22109 window_data_layer.cpp:155] num: 6800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_18603.JPEG 3 335 500 windows to process: 201
+I1107 16:01:47.203476 22109 window_data_layer.cpp:155] num: 6900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_22441.JPEG 3 300 500 windows to process: 201
+I1107 16:01:47.213376 22109 window_data_layer.cpp:155] num: 7000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_2556.JPEG 3 1200 1600 windows to process: 201
+I1107 16:01:47.223289 22109 window_data_layer.cpp:155] num: 7100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_28064.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.233340 22109 window_data_layer.cpp:155] num: 7200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_3038.JPEG 3 150 200 windows to process: 201
+I1107 16:01:47.243265 22109 window_data_layer.cpp:155] num: 7300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_33838.JPEG 3 408 612 windows to process: 201
+I1107 16:01:47.253170 22109 window_data_layer.cpp:155] num: 7400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_4262.JPEG 3 448 640 windows to process: 201
+I1107 16:01:47.264549 22109 window_data_layer.cpp:155] num: 7500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_6237.JPEG 3 118 192 windows to process: 201
+I1107 16:01:47.274449 22109 window_data_layer.cpp:155] num: 7600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01496331/n01496331_8193.JPEG 3 331 500 windows to process: 201
+I1107 16:01:47.284299 22109 window_data_layer.cpp:155] num: 7700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_10279.JPEG 3 500 375 windows to process: 201
+I1107 16:01:47.294353 22109 window_data_layer.cpp:155] num: 7800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_11099.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.304275 22109 window_data_layer.cpp:155] num: 7900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_12069.JPEG 3 348 500 windows to process: 201
+I1107 16:01:47.314116 22109 window_data_layer.cpp:155] num: 8000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_13387.JPEG 3 374 500 windows to process: 202
+I1107 16:01:47.326527 22109 window_data_layer.cpp:155] num: 8100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_18398.JPEG 3 334 500 windows to process: 201
+I1107 16:01:47.337298 22109 window_data_layer.cpp:155] num: 8200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_2274.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.347180 22109 window_data_layer.cpp:155] num: 8300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_3034.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.357192 22109 window_data_layer.cpp:155] num: 8400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_4203.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.367056 22109 window_data_layer.cpp:155] num: 8500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_5353.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.376878 22109 window_data_layer.cpp:155] num: 8600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_6308.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.388296 22109 window_data_layer.cpp:155] num: 8700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_7316.JPEG 3 500 375 windows to process: 201
+I1107 16:01:47.398298 22109 window_data_layer.cpp:155] num: 8800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_8374.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.408103 22109 window_data_layer.cpp:155] num: 8900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01498041/n01498041_9435.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.418154 22109 window_data_layer.cpp:155] num: 9000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_11044.JPEG 3 333 500 windows to process: 201
+I1107 16:01:47.427985 22109 window_data_layer.cpp:155] num: 9100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_13354.JPEG 3 500 375 windows to process: 201
+I1107 16:01:47.437875 22109 window_data_layer.cpp:155] num: 9200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_14558.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.449244 22109 window_data_layer.cpp:155] num: 9300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_15957.JPEG 3 388 500 windows to process: 201
+I1107 16:01:47.459209 22109 window_data_layer.cpp:155] num: 9400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_17108.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.469128 22109 window_data_layer.cpp:155] num: 9500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_18338.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.479362 22109 window_data_layer.cpp:155] num: 9600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_19402.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.489259 22109 window_data_layer.cpp:155] num: 9700 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_20605.JPEG 3 345 500 windows to process: 201
+I1107 16:01:47.499092 22109 window_data_layer.cpp:155] num: 9800 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_21872.JPEG 3 500 333 windows to process: 201
+I1107 16:01:47.510536 22109 window_data_layer.cpp:155] num: 9900 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_23101.JPEG 3 343 500 windows to process: 201
+I1107 16:01:47.520494 22109 window_data_layer.cpp:155] num: 10000 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_34653.JPEG 3 364 500 windows to process: 201
+I1107 16:01:47.530388 22109 window_data_layer.cpp:155] num: 10100 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_48695.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.540557 22109 window_data_layer.cpp:155] num: 10200 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514668/n01514668_8287.JPEG 3 333 500 windows to process: 201
+I1107 16:01:47.550447 22109 window_data_layer.cpp:155] num: 10300 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514859/n01514859_10417.JPEG 3 375 500 windows to process: 201
+I1107 16:01:47.560223 22109 window_data_layer.cpp:155] num: 10400 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514859/n01514859_11162.JPEG 3 333 500 windows to process: 201
+I1107 16:01:47.571436 22109 window_data_layer.cpp:155] num: 10500 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514859/n01514859_12241.JPEG 3 374 500 windows to process: 202
+I1107 16:01:47.581436 22109 window_data_layer.cpp:155] num: 10600 /home/hongyang/ImageNet_data_1/cls_original_image/train/n01514859/n01514859_14545.JPEG 3 332 500 windows to process: 201

@@ -7,11 +7,14 @@ mpi_path=/home/dependency/mpi_cuda/bin
 
 # phase 1
 # all layers except the last softmax (1001 output) have zero lr
-nohup $mpi_path/mpirun -np 1 \
+#nohup 
+GLOG_logtostderr=1 \
+	$mpi_path/mpirun -np 2 \
 	$caffe_path/caffe train \
 	-weights=vgg_ft_iter_117500.caffemodel \
    	-solver=solver_1.prototxt \
-   	> hinge_loss_1.log 2>&1 &
+2>&1 | tee hell.log  	
+#> hinge_loss_1.log 2>&1 &
 
 # # phase 2
 # nohup $mpi_path/mpirun -np 1 \

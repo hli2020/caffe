@@ -1,7 +1,7 @@
 # solver for finetune
 net: "train_val_vgg_1.prototxt"
 snapshot_prefix: "result/vgg_ft_p1"
-device_id: 1
+device_id: [0,1]
 
 test_iter: 1250
 test_interval: 2500

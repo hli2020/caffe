@@ -451,6 +451,8 @@ protected:
 	bool has_mean_values_;
 	bool cache_images_;
 	vector<std::pair<std::string, Datum > > image_database_cache_;
+        int total_windows_idx_;
+        vector<Window> total_windows_;
 };
 
 }  // namespace caffe

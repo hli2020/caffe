@@ -962,6 +962,7 @@ message WindowDataParameter {
   optional bool cache_images = 12 [default = false];
   // append root_folder to locate images
   optional string root_folder = 13 [default = ""];
+  optional bool random_order = 21 [default = true];
 }
 
 
