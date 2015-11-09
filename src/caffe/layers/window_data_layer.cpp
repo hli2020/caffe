@@ -221,8 +221,6 @@ void WindowDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       }
     }
   }
- this->total_windows_idx_ = 0;
-  this->total_windows_.clear();
 
 }
 
