@@ -114,20 +114,40 @@ def main(argv):
     if args.input_file.endswith('npy'):
         print("Loading file: %s" % args.input_file)
         inputs = np.load(args.input_file)
+        print("Classifying %d inputs." % len(inputs))
+        start = time.time()
+        predictions = classifier.predict(inputs, not args.center_only)
+        print("Done in %.2f s." % (time.time() - start))
     elif os.path.isdir(args.input_file):
         print("Loading folder: %s" % args.input_file)
-        inputs =[caffe.io.load_image(im_f)
-                 for im_f in glob.glob(args.input_file + '/*.' + args.ext)]
+        predictions = []
+        files = glob.glob(args.input_file + '/*.' + args.ext)
+        files.sort()
+        print("Classifying %d inputs." % len(files))
+        start = time.time()
+        im_batch_size = 5
+        num_batches = (len(files) - 1) // im_batch_size + 1
+        for i in xrange(num_batches):
+            begin = i * im_batch_size
+            end = min(begin + im_batch_size, len(files))
+            inputs = []
+            for j in xrange(begin, end):
+                inputs.append(caffe.io.load_image(files[j]))
+            preds = classifier.predict(inputs, not args.center_only)
+            predictions.extend(preds)
+            time_elapsed = time.time() - start
+            eta = time_elapsed / (i + 1) * (num_batches - i - 1)
+            print("Batch %d / %d, Time %.2f s, ETA %.2f s" % (i, num_batches,
+                time_elapsed, eta))
+        predictions = np.asarray(predictions)
+        print("Done in %.2f s." % (time.time() - start))
     else:
         print("Loading file: %s" % args.input_file)
         inputs = [caffe.io.load_image(args.input_file)]
-
-    print("Classifying %d inputs." % len(inputs))
-
-    # Classify.
-    start = time.time()
-    predictions = classifier.predict(inputs, not args.center_only)
-    print("Done in %.2f s." % (time.time() - start))
+        print("Classifying %d inputs." % len(inputs))
+        start = time.time()
+        predictions = classifier.predict(inputs, not args.center_only)
+        print("Done in %.2f s." % (time.time() - start))
 
     # Save
     print("Saving results into %s" % args.output_file)

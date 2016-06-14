@@ -1,6 +1,9 @@
 #include <glog/logging.h>
 #include <cstdio>
 #include <ctime>
+#ifdef USE_MPI
+#include <mpi.h>
+#endif
 
 #include "caffe/common.hpp"
 #include "caffe/util/rng.hpp"
@@ -37,14 +40,27 @@ void GlobalInit(int* pargc, char*** pargv) {
   ::google::InitGoogleLogging(*(pargv)[0]);
   // Provide a backtrace on segfault.
   ::google::InstallFailureSignalHandler();
+#ifdef USE_MPI
+  MPI_Init(pargc, pargv);
+#endif
 }
 
 #ifdef CPU_ONLY  // CPU-only Caffe.
 
 Caffe::Caffe()
-    : random_generator_(), mode_(Caffe::CPU) { }
+    : random_generator_(), mode_(Caffe::CPU) {
+#ifdef USE_MPI
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank_);
+  MPI_Comm_size(MPI_COMM_WORLD, &mpi_size_);
+  if (mpi_rank_ > 0) FLAGS_minloglevel = 5;
+#endif
+}
 
-Caffe::~Caffe() { }
+Caffe::~Caffe() {
+#ifdef USE_MPI
+  MPI_Finalize();
+#endif
+}
 
 void Caffe::set_random_seed(const unsigned int seed) {
   // RNG seed
@@ -99,6 +115,11 @@ Caffe::Caffe()
       != CURAND_STATUS_SUCCESS) {
     LOG(ERROR) << "Cannot create Curand generator. Curand won't be available.";
   }
+#ifdef USE_MPI
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank_);
+  MPI_Comm_size(MPI_COMM_WORLD, &mpi_size_);
+  if (mpi_rank_ > 0) FLAGS_minloglevel = 5;
+#endif
 }
 
 Caffe::~Caffe() {
@@ -106,6 +127,9 @@ Caffe::~Caffe() {
   if (curand_generator_) {
     CURAND_CHECK(curandDestroyGenerator(curand_generator_));
   }
+#ifdef USE_MPI
+  MPI_Finalize();
+#endif
 }
 
 void Caffe::set_random_seed(const unsigned int seed) {

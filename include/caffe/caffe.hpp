@@ -14,6 +14,7 @@
 #include "caffe/solver.hpp"
 #include "caffe/util/benchmark.hpp"
 #include "caffe/util/io.hpp"
+#include "caffe/util/mpi_templates.hpp"
 #include "caffe/vision_layers.hpp"
 
 #endif  // CAFFE_CAFFE_HPP_

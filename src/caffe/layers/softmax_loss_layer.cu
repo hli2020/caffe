@@ -53,7 +53,7 @@ void SoftmaxWithLossLayer<Dtype>::Forward_gpu(
   if (normalize_) {
     Dtype count;
     caffe_gpu_asum(nthreads, counts, &count);
-    loss /= count;
+    if (count > 0) loss /= count;
   } else {
     loss /= outer_num_;
   }

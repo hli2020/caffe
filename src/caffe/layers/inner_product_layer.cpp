@@ -90,6 +90,7 @@ void InnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
         bias_multiplier_.cpu_data(),
         this->blobs_[1]->cpu_data(), (Dtype)1., top_data);
   }
+  printf("ip forward: %.6lf\n", top[0]->asum_data() / top[0]->count());
 }
 
 template <typename Dtype>
@@ -117,6 +118,7 @@ void InnerProductLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
         top_diff, this->blobs_[0]->cpu_data(), (Dtype)0.,
         bottom[0]->mutable_cpu_diff());
   }
+  printf("ip backward: %.6lf\n", this->blobs_[0]->asum_diff() / this->blobs_[0]->count());
 }
 
 #ifdef CPU_ONLY

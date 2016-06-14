@@ -1,0 +1,21 @@
+net: "net_def/train_val_v10.4_bias_init.prototxt"
+snapshot_prefix: "result/cifar10_v10.4_bias_init"
+
+test_iter: 100
+test_interval: 1000
+test_initialization: false
+
+base_lr: 0.1
+momentum: 0.9
+weight_decay: 0.005
+
+lr_policy: "step"
+gamma: 0.1
+stepsize: 20000
+max_iter: 100000
+
+#average_loss: 50
+display: 100
+snapshot: 1000
+solver_mode: GPU
+

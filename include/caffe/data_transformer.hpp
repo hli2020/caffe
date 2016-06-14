@@ -74,6 +74,8 @@ class DataTransformer {
    */
   void Transform(const cv::Mat& cv_img, Blob<Dtype>* transformed_blob);
 
+  void Transform_customize(const cv::Mat& cv_img, Blob<Dtype>* transformed_blob);
+
   /**
    * @brief Applies the same transformation defined in the data layer's
    * transform_param block to all the num images in a input_blob.
@@ -87,7 +89,7 @@ class DataTransformer {
    */
   void Transform(Blob<Dtype>* input_blob, Blob<Dtype>* transformed_blob);
 
- protected:
+  protected:
    /**
    * @brief Generates a random integer from Uniform({0, 1, ..., n-1}).
    *

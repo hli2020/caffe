@@ -1,0 +1,17 @@
+net: "train_val_v8.0_aug_c100.prototxt"
+
+test_iter: 100
+test_interval: 1000
+base_lr: 0.1
+display: 100
+max_iter: 200000
+lr_policy: "step"
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.005
+stepsize: 40000
+snapshot: 1000
+snapshot_prefix: "result/cifar10_v8.0_c100_small_rescale"
+solver_mode: GPU
+test_initialization: false
+average_loss: 50

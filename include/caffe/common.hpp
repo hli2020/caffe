@@ -149,6 +149,10 @@ class Caffe {
   static void SetDevice(const int device_id);
   // Prints the current GPU status.
   static void DeviceQuery();
+#ifdef USE_MPI
+  inline static int mpi_rank() { return Get().mpi_rank_; }
+  inline static int mpi_size() { return Get().mpi_size_; }
+#endif
 
  protected:
 #ifndef CPU_ONLY
@@ -159,6 +163,11 @@ class Caffe {
 
   Brew mode_;
   static shared_ptr<Caffe> singleton_;
+
+#ifdef USE_MPI
+  int mpi_rank_;
+  int mpi_size_;
+#endif
 
  private:
   // The private constructor to avoid duplicate instantiation.

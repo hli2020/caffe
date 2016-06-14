@@ -101,6 +101,11 @@ class Net {
   /// @brief Writes the net to a proto.
   void ToProto(NetParameter* param, bool write_diff = false) const;
 
+#ifdef USE_MPI
+  // Synchronize the parameters of each layer among all the MPI processors.
+  void SyncLayers();
+#endif
+
   /// @brief returns the network name.
   inline const string& name() const { return name_; }
   /// @brief returns the layer names
@@ -153,6 +158,10 @@ class Net {
     return param_names_index_;
   }
   inline const vector<int>& param_owners() const { return param_owners_; }
+  /// @brief returns the layer and index of the parameters
+  inline const vector<pair<int, int> >& param_layer_indices() const {
+    return param_layer_indices_;
+  }
   /// @brief Input and output blob numbers
   inline int num_inputs() const { return net_input_blobs_.size(); }
   inline int num_outputs() const { return net_output_blobs_.size(); }
@@ -186,6 +195,10 @@ class Net {
   static bool StateMeetsRule(const NetState& state, const NetStateRule& rule,
       const string& layer_name);
 
+#ifdef USE_MPI
+  inline const set<string>& serial_layers() const { return serial_layers_; }
+#endif
+
  protected:
   // Helpers for Init.
   /// @brief Append a new input or top blob to the net.
@@ -211,6 +224,11 @@ class Net {
 
   /// @brief Get misc parameters, e.g. the LR multiplier and weight decay.
   void GetLearningRateAndWeightDecay();
+
+#ifdef USE_MPI
+  /// @brief Determine whether a layer should be in parallel or serial.
+  void DetermineLayerParallelOrSerial(const NetParameter& param);
+#endif
 
   /// @brief The network name
   string name_;
@@ -258,6 +276,11 @@ class Net {
   size_t memory_used_;
   /// Whether to compute and display debug info for the net.
   bool debug_info_;
+
+#ifdef USE_MPI
+  /// The layers in serialization.
+  set<string> serial_layers_;
+#endif
 
   DISABLE_COPY_AND_ASSIGN(Net);
 };

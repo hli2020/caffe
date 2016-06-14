@@ -4,6 +4,9 @@
 
 #include <string>
 #include <vector>
+#ifdef USE_MPI
+#include <mpi.h>
+#endif
 
 #include "caffe/common.hpp"
 #include "caffe/data_layers.hpp"
@@ -30,12 +33,19 @@ void DataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   cursor_.reset(db_->NewCursor());
 
   // Check if we should randomly skip a few data points
+  unsigned int skip = 0;
   if (this->layer_param_.data_param().rand_skip()) {
-    unsigned int skip = caffe_rng_rand() %
-                        this->layer_param_.data_param().rand_skip();
-    LOG(INFO) << "Skipping first " << skip << " data points.";
-    while (skip-- > 0) {
-      cursor_->Next();
+    skip = caffe_rng_rand() % this->layer_param_.data_param().rand_skip();
+  }
+#ifdef USE_MPI
+  MPI_Bcast(&skip, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
+  skip += this->layer_param_.data_param().batch_size() * Caffe::mpi_rank();
+#endif
+  LOG(INFO) << "Skipping first " << skip << " data points.";
+  while (skip-- > 0) {
+    cursor_->Next();
+    if (!cursor_->valid()) {
+      cursor_->SeekToFirst();
     }
   }
   // Read a data point, and use it to initialize the top blob.
@@ -73,6 +83,16 @@ void DataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     top[1]->Reshape(label_shape);
     this->prefetch_label_.Reshape(label_shape);
   }
+  // Initialize the shuffle pool index
+  const int shuffle_pool_size =
+      this->layer_param_.data_param().shuffle_pool_size();
+  if (shuffle_pool_size > 1) {
+    shuffle_pool_index_.resize(shuffle_pool_size *
+        this->layer_param_.data_param().batch_size());
+    for (int i = 0; i < shuffle_pool_index_.size(); ++i) {
+      shuffle_pool_index_[i] = i;
+    }
+  }
 }
 
 // This function is used to create a thread that prefetches the data.
@@ -89,7 +109,11 @@ void DataLayer<Dtype>::InternalThreadEntry() {
   // Reshape on single input batches for inputs of varying dimension.
   const int batch_size = this->layer_param_.data_param().batch_size();
   const int crop_size = this->layer_param_.transform_param().crop_size();
+  const int shuffle_pool_size =
+      this->layer_param_.data_param().shuffle_pool_size();
+  
   bool force_color = this->layer_param_.data_param().force_encoded_color();
+  bool customize = this->layer_param_.transform_param().customize();
   if (batch_size == 1 && crop_size == 0) {
     Datum datum;
     datum.ParseFromString(cursor_->value());
@@ -108,16 +132,33 @@ void DataLayer<Dtype>::InternalThreadEntry() {
 
   Dtype* top_data = this->prefetch_data_.mutable_cpu_data();
   Dtype* top_label = NULL;  // suppress warnings about uninitialized variables
+  
+  const bool is_shuffle_pool_full = (shuffle_pool_size > 1
+      && shuffle_pool_.size() >= shuffle_pool_size * batch_size);
+  if (is_shuffle_pool_full) {
+    shuffle(shuffle_pool_index_.begin(), shuffle_pool_index_.end());
+  }
 
   if (this->output_labels_) {
     top_label = this->prefetch_label_.mutable_cpu_data();
   }
+  
   for (int item_id = 0; item_id < batch_size; ++item_id) {
     timer.Start();
     // get a blob
     Datum datum;
     datum.ParseFromString(cursor_->value());
 
+    if (is_shuffle_pool_full) {
+      int pool_index = shuffle_pool_index_[item_id];
+      datum = shuffle_pool_[pool_index];
+      shuffle_pool_[pool_index].ParseFromString(cursor_->value());
+    } else {
+      datum.ParseFromString(cursor_->value());
+      if (shuffle_pool_size > 1) { // Ths shuffle pool is not full.
+        shuffle_pool_.push_back(datum);
+      }
+    }
     cv::Mat cv_img;
     if (datum.encoded()) {
       if (force_color) {
@@ -138,11 +179,20 @@ void DataLayer<Dtype>::InternalThreadEntry() {
     // Apply data transformations (mirror, scale, crop...)
     int offset = this->prefetch_data_.offset(item_id);
     this->transformed_data_.set_cpu_data(top_data + offset);
+
     if (datum.encoded()) {
-      this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
+      //LOG(INFO) << "data is encoded!!!";
+
+      if (customize) {
+        this->data_transformer_->Transform_customize(cv_img, &(this->transformed_data_));
+      } else {
+        this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
+      }
+      
     } else {
       this->data_transformer_->Transform(datum, &(this->transformed_data_));
     }
+
     if (this->output_labels_) {
       top_label[item_id] = datum.label();
     }
@@ -154,6 +204,16 @@ void DataLayer<Dtype>::InternalThreadEntry() {
       cursor_->SeekToFirst();
     }
   }
+
+
+#ifdef USE_MPI
+  for (int i = 0; i < batch_size * (Caffe::mpi_size() - 1); ++i) {
+    cursor_->Next();
+    if (!cursor_->valid()) {
+      cursor_->SeekToFirst();
+    }
+  }
+#endif
   batch_timer.Stop();
   DLOG(INFO) << "Prefetch batch: " << batch_timer.MilliSeconds() << " ms.";
   DLOG(INFO) << "     Read time: " << read_time / 1000 << " ms.";
